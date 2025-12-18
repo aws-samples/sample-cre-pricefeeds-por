@@ -182,4 +182,4 @@ sam delete --stack-name asset-price-service
   
 ## License
 
-ISC
+MIT

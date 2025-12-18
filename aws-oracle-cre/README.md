@@ -222,4 +222,4 @@ View transaction results on [Sepolia Etherscan](https://sepolia.etherscan.io/).
 
 ## License
 
-ISC
+MIT
