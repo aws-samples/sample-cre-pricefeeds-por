@@ -25,7 +25,7 @@ This project demonstrates workflows using the Chainlink Runtime Environment to f
   - Verify authentication with `cre whoami`
 - **Node.js** - 20+ for AWS Lambda functions
 - **Go** - 1.25.3+ for CRE workflows
-- **Sepolia ETH** - For contract deployment and transactions ([Get testnet ETH](https://faucets.chain.link))
+- **Sepolia ETH** - For contract deployment and transactions ([Get testnet ETH at a public faucet](https://faucets.chain.link))
 
 > **Windows Users:** This sample uses Bash scripts and Unix tools. Please run deployments using WSL2.
 
