@@ -27,6 +27,8 @@ This project demonstrates workflows using the Chainlink Runtime Environment to f
 - **Go** - 1.25.3+ for CRE workflows
 - **Sepolia ETH** - For contract deployment and transactions ([Get testnet ETH](https://faucets.chain.link))
 
+> **Windows Users:** This sample uses Bash scripts and Unix tools. Please run deployments using WSL2.
+
 ## Quick Start
 
 ### Automated Deployment (Recommended)
