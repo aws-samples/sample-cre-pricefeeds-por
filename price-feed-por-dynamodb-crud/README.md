@@ -30,6 +30,7 @@ API Gateway → Lambda Functions → DynamoDB
 - Node.js 20.x or later
 - AWS CLI configured with appropriate credentials
 - AWS SAM CLI installed
+- esbuild installed globally: `npm install -g esbuild`
 
 ## Deployment
 

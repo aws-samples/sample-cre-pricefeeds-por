@@ -24,6 +24,14 @@ if ! command -v sam &> /dev/null; then
     exit 1
 fi
 
+# Check if esbuild is installed
+if ! command -v esbuild &> /dev/null; then
+    echo "❌ Error: esbuild is not installed"
+    echo "esbuild is required for SAM builds with TypeScript"
+    echo "Install globally: npm install -g esbuild"
+    exit 1
+fi
+
 # Check AWS credentials
 echo "🔍 Checking AWS credentials..."
 if ! aws sts get-caller-identity &> /dev/null; then

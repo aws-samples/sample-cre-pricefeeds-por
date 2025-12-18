@@ -78,19 +78,32 @@ ensure_cmd() {
 }
 
 install_sam_cli_fallback() {
+  # Add .local/bin to PATH for this session
+  export PATH="$HOME/.local/bin:$PATH"
+  
   if command -v sam >/dev/null 2>&1; then return 0; fi
 
-  echo -e "${YELLOW}⚠️  SAM CLI not found — attempting fallback install via pipx/pip...${NC}"
+  echo -e "${YELLOW}⚠️  SAM CLI not found — attempting fallback install...${NC}"
+
+  # Try pip first (simpler, more common)
+  if command -v pip3 >/dev/null 2>&1 || command -v pip >/dev/null 2>&1; then
+    python3 -m pip install --user --upgrade aws-sam-cli 2>/dev/null || pip install --user --upgrade aws-sam-cli 2>/dev/null || true
+    if command -v sam >/dev/null 2>&1; then return 0; fi
+  fi
+
+  # Fallback to pipx if pip failed
+  if ! command -v pipx >/dev/null 2>&1; then
+    echo -e "${YELLOW}Installing pipx...${NC}"
+    case "$PM" in
+      apt) pm_install "$PM" pipx ;;
+      dnf|yum) pm_install "$PM" pipx ;;
+      *) return 1 ;;
+    esac
+  fi
 
   if command -v pipx >/dev/null 2>&1; then
     pipx install aws-sam-cli || pipx upgrade aws-sam-cli || true
-    export PATH="$HOME/.local/bin:$PATH"
-  elif command -v python3 >/dev/null 2>&1; then
-    python3 -m pip install --user --upgrade aws-sam-cli
-    export PATH="$HOME/.local/bin:$PATH"
-  else
-    echo -e "${RED}❌ Cannot install SAM CLI: missing pipx or python3-pip.${NC}"
-    return 1
+    pipx ensurepath || true
   fi
 
   command -v sam >/dev/null 2>&1
@@ -192,11 +205,18 @@ ensure_cmd git  "$PM" git
 # AWS CLI
 if ! command -v aws >/dev/null 2>&1; then
   echo -e "${YELLOW}⚠️  aws not found — attempting install...${NC}"
-  if ! pm_install "$PM" awscli 2>/dev/null; then
-    pm_install "$PM" awscli2 2>/dev/null || {
-      echo -e "${RED}❌ Could not install AWS CLI via package manager. Install AWS CLI v2 manually.${NC}"
+  if ! pm_install "$PM" awscli 2>/dev/null && ! pm_install "$PM" awscli2 2>/dev/null; then
+    # Fallback: Install AWS CLI v2 manually
+    echo -e "${YELLOW}Installing AWS CLI v2 manually...${NC}"
+    curl -sS "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+    if command -v unzip >/dev/null 2>&1 || pm_install "$PM" unzip; then
+      unzip -q /tmp/awscliv2.zip -d /tmp
+      sudo /tmp/aws/install
+      rm -rf /tmp/aws /tmp/awscliv2.zip
+    else
+      echo -e "${RED}❌ Could not install AWS CLI: unzip not available${NC}"
       exit 1
-    }
+    fi
   fi
 fi
 command -v aws >/dev/null 2>&1 || { echo -e "${RED}❌ AWS CLI still missing${NC}"; exit 1; }
@@ -209,9 +229,46 @@ if ! command -v sam >/dev/null 2>&1; then
   else
     pm_install "$PM" aws-sam-cli 2>/dev/null || true
   fi
-  install_sam_cli_fallback || { echo -e "${RED}❌ SAM CLI install failed${NC}"; exit 1; }
+  install_sam_cli_fallback || { 
+    echo -e "${RED}❌ SAM CLI install failed${NC}"
+    echo -e "${YELLOW}Install manually: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html${NC}"
+    exit 1
+  }
 fi
 echo -e "${GREEN}✅ sam found${NC}"
+
+# Node.js (required for SAM builds with esbuild)
+if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
+  echo -e "${YELLOW}⚠️  Node.js not found — attempting install...${NC}"
+  case "$PM" in
+    brew) pm_install "$PM" node ;;
+    apt)  pm_install "$PM" nodejs npm ;;
+    dnf|yum) pm_install "$PM" nodejs npm ;;
+    pacman) pm_install "$PM" nodejs npm ;;
+  esac
+  if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
+    echo -e "${GREEN}✅ Node.js installed${NC}"
+  else
+    echo -e "${RED}❌ Node.js install failed${NC}"
+    exit 1
+  fi
+else
+  echo -e "${GREEN}✅ Node.js found${NC}"
+fi
+
+# esbuild (required for SAM builds)
+if ! command -v esbuild >/dev/null 2>&1; then
+  echo -e "${YELLOW}⚠️  esbuild not found — installing globally via npm...${NC}"
+  sudo npm install -g esbuild 2>/dev/null || npm install -g esbuild
+  if command -v esbuild >/dev/null 2>&1; then
+    echo -e "${GREEN}✅ esbuild installed${NC}"
+  else
+    echo -e "${RED}❌ esbuild install failed${NC}"
+    exit 1
+  fi
+else
+  echo -e "${GREEN}✅ esbuild found${NC}"
+fi
 
 # Go (needed for `go mod tidy` and bindings steps)
 install_go || exit 1
