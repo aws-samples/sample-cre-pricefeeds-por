@@ -4,7 +4,9 @@
 
 ## Overview
 
-This project demonstrates workflows using the Chainlink Runtime Environment to fetch data from AWS serverless APIs and write results to Ethereum smart contracts. The system combines AWS scalability with blockchain reliability for price feeds and proof of reserves monitoring.
+This project demonstrates workflows using the Chainlink Runtime Environment to fetch data from AWS serverless APIs and write results to Ethereum smart contracts. 
+
+The system combines AWS reliability with decentralized trust guarantees for price feeds and proof-of-reserves monitoring.
 
 ## Architecture
 
