@@ -1,0 +1,222 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Asset Price Service - Serverless API for tracking asset prices and proof of reserves
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: nodejs20.x
+    MemorySize: 256
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref AssetDataTable
+    Architectures:
+      - x86_64
+
+Resources:
+  # DynamoDB Table
+  AssetDataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: AssetData
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: recordType
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: recordType
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+
+  # API Gateway
+  AssetPriceApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Auth:
+        ApiKeyRequired: true
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+
+  # API Key
+  AssetPriceApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    DependsOn:
+      - AssetPriceApiprodStage
+    Properties:
+      Name: AssetPriceApiKey
+      Enabled: true
+      StageKeys:
+        - RestApiId: !Ref AssetPriceApi
+          StageName: prod
+
+  # Usage Plan
+  AssetPriceUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    DependsOn:
+      - AssetPriceApiprodStage
+    Properties:
+      UsagePlanName: AssetPriceUsagePlan
+      ApiStages:
+        - ApiId: !Ref AssetPriceApi
+          Stage: prod
+      Throttle:
+        RateLimit: 100
+        BurstLimit: 200
+
+  # Link API Key to Usage Plan
+  AssetPriceUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId: !Ref AssetPriceApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref AssetPriceUsagePlan
+
+  # Lambda Functions
+  StoreAssetPriceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handlers/storeAssetPrice.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AssetDataTable
+      Events:
+        StoreAssetPrice:
+          Type: Api
+          Properties:
+            RestApiId: !Ref AssetPriceApi
+            Path: /asset-price
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: false
+        EntryPoints:
+          - handlers/storeAssetPrice.ts
+        External:
+          - '@aws-sdk/*'
+
+  GetAssetPriceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handlers/getAssetPrice.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref AssetDataTable
+      Events:
+        GetAssetPrice:
+          Type: Api
+          Properties:
+            RestApiId: !Ref AssetPriceApi
+            Path: /asset-price/latest
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: false
+        EntryPoints:
+          - handlers/getAssetPrice.ts
+        External:
+          - '@aws-sdk/*'
+
+  StoreProofOfReservesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handlers/storeProofOfReserves.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AssetDataTable
+      Events:
+        StoreProofOfReserves:
+          Type: Api
+          Properties:
+            RestApiId: !Ref AssetPriceApi
+            Path: /proof-of-reserves
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: false
+        EntryPoints:
+          - handlers/storeProofOfReserves.ts
+        External:
+          - '@aws-sdk/*'
+
+  GetProofOfReservesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handlers/getProofOfReserves.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref AssetDataTable
+      Events:
+        GetProofOfReserves:
+          Type: Api
+          Properties:
+            RestApiId: !Ref AssetPriceApi
+            Path: /proof-of-reserves/latest
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: false
+        EntryPoints:
+          - handlers/getProofOfReserves.ts
+        External:
+          - '@aws-sdk/*'
+
+  SimulateDataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handlers/simulateData.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AssetDataTable
+      Events:
+        SimulateData:
+          Type: Api
+          Properties:
+            RestApiId: !Ref AssetPriceApi
+            Path: /simulate
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: false
+        EntryPoints:
+          - handlers/simulateData.ts
+        External:
+          - '@aws-sdk/*'
+
+Outputs:
+  AssetPriceApiUrl:
+    Description: "API Gateway endpoint URL for Asset Price Service"
+    Value: !Sub "https://${AssetPriceApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+  
+  AssetDataTableName:
+    Description: "DynamoDB table name"
+    Value: !Ref AssetDataTable
+  
+  ApiKeyId:
+    Description: "API Key ID (use 'aws apigateway get-api-key --api-key <id> --include-value' to retrieve the key)"
+    Value: !Ref AssetPriceApiKey

@@ -1,0 +1,51 @@
+# Environment variables and secrets
+*.env
+.env
+.env.*
+
+# Go build artifacts
+*.wasm
+tmp.wasm
+
+# Foundry/Forge artifacts
+contracts/evm/out/
+contracts/evm/cache/
+contracts/evm/broadcast/
+contracts/evm/lib/
+
+# Foundry lock file (optional - some prefer to commit this)
+# contracts/evm/foundry.lock
+
+# Node modules (if any)
+node_modules/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Go specific
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS files
+Thumbs.db
+.DS_Store

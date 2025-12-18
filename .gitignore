@@ -1,0 +1,28 @@
+# Environment and secrets
+.DS_Store
+.env
+.env.*
+
+# Dependencies
+node_modules/
+
+# AWS
+.aws-sam/
+
+# Build artifacts
+dist/
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Kiro
+.kiro/
+
+# Temporary files
+*.tmp
+*.bak
+
+# Presentation
+**/PRESENTATION.md
