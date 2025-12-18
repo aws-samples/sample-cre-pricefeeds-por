@@ -1,4 +1,4 @@
-# Integrating AWS with Chainlink Runtime Environment Workflows (CRE)
+# Integrating AWS with Chainlink Runtime Environment (CRE) Workflows
 
 **Authored by: Simon Goldberg**
 
