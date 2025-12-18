@@ -7,7 +7,8 @@ Serverless REST API for tracking asset prices and proof of reserves data using A
 ## Quick Start
 
 ```bash
-cd ~/sample-cre-pricefeeds-por/price-feed-por-dynamodb-crud
+git clone https://github.com/aws-samples/sample-cre-pricefeeds-por.git
+cd sample-cre-pricefeeds-por/price-feed-por-dynamodb-crud
 ./deploy.sh
 source ./setup-env.sh
 ./test-api.sh
@@ -36,7 +37,7 @@ API Gateway → Lambda Functions → DynamoDB
 
 Deploy the stack:
 ```bash
-cd ~/sample-cre-pricefeeds-por/price-feed-por-dynamodb-crud
+cd sample-cre-pricefeeds-por/price-feed-por-dynamodb-crud
 ./deploy.sh
 ```
 

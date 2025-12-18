@@ -33,9 +33,11 @@ This project demonstrates workflows using the Chainlink Runtime Environment to f
 
 ### Automated Deployment (Recommended)
 
-Deploy everything with a single script:
+Clone the repository and deploy everything with a single script:
 
 ```bash
+git clone https://github.com/aws-samples/sample-cre-pricefeeds-por.git
+cd sample-cre-pricefeeds-por
 ./deploy-all.sh
 ```
 
