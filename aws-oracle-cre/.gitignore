@@ -11,7 +11,8 @@ tmp.wasm
 contracts/evm/out/
 contracts/evm/cache/
 contracts/evm/broadcast/
-contracts/evm/lib/
+contracts/evm/lib/*
+!contracts/evm/lib/forge-std
 
 # Foundry lock file (optional - some prefer to commit this)
 # contracts/evm/foundry.lock
