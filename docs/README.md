@@ -6,12 +6,18 @@
 
 This project demonstrates workflows using the Chainlink Runtime Environment to fetch data from AWS serverless APIs and write results to Ethereum smart contracts. 
 
-The system combines AWS reliability with decentralized trust guarantees for price feeds and proof-of-reserves monitoring.
+The system combines AWS reliability with decentralized trust guarantees to support digital asset price feeds and proof-of-reserves monitoring.
 
 ## Architecture
 
 ![Architecture Diagram](./architecture.png)
 
+## Use Cases
+
+- **Price feeds for DeFi protocols**: Low-latency, tamper-resistant pricing data for lending, derivatives, and AMMs with decentralized verification.
+- **Proof-of-reserves monitoring**: Continuous verification that stablecoins and wrapped assets are fully backed by underlying reserves.
+- **Custom data feeds**: Configurable, multi-source data feeds for tokenized assets. 
+  
 ## Components
 
 - **AWS Serverless Backend** - REST API with Lambda and DynamoDB for oracle data storage ([Setup Guide](../price-feed-por-dynamodb-crud/README.md))
@@ -59,12 +65,6 @@ Deploy the serverless REST API with Lambda and DynamoDB. See [AWS Backend README
 Configure and run the CRE workflow to fetch data from AWS and update smart contracts on Ethereum Sepolia. See [CRE Workflow README](../aws-oracle-cre/README.md) for complete setup instructions, including smart contract deployment and configuration.
 
 > **Note:** CRE is also available in TypeScript. For TypeScript implementation details, refer to the [CRE documentation](https://docs.chain.link/cre).
-
-## Use Cases
-
-- Price feeds for DeFi protocols
-- Proof of reserves monitoring for stablecoins/wrapped assets
-- Custom oracle data feeds with AWS scalability
 
 ## Documentation
 
