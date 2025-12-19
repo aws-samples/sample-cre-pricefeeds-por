@@ -76,6 +76,7 @@ Configure and run the CRE workflow to fetch data from AWS and update smart contr
 
 - **Chainlink CRE** - v1.0.3 (Workflow orchestration)
 - **AWS SAM** - Infrastructure as Code
+- **Amazon API Gateway** - Managed API service for HTTP/REST endpoints Lambda integation and authorization 
 - **AWS Lambda** - Serverless compute
 - **AWS DynamoDB** - NoSQL database
 - **Solidity** - Smart contracts
